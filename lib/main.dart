@@ -10,13 +10,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 //this is the name given to the background fetch
 const simplePeriodicTask = "simplePeriodicTask";
 // flutter local notification setup
-void showNotification({v, flp}) async {
+void showNotification({n,v, flp}) async {
   var android = AndroidNotificationDetails(
-      'channel id', 'channel NAME', 'CHANNEL DESCRIPTION',
+      'owlMall_id_001', 'owlMall name', 'owl alert detail',
       priority: Priority.high, importance: Importance.max);
   var iOS = IOSNotificationDetails();
   var platform = NotificationDetails(android: android, iOS: iOS);
-  await flp.show(0, 'owl', '$v', platform, payload: '\n $v');
+  await flp.show(0, '$n', '$v', platform, payload: '\n $v');
 }
 
 Future<void> main() async {
@@ -48,26 +48,18 @@ void callbackDispatcher() {
     flp.initialize(initSettlings);
 
     var url = Uri.parse("https://api.tonserver.cf/public/api/read/lastid.php");
-
     final response = await http.get(url);
     final responseJson = json.decode(response.body);
 
-    print(responseJson['id']);
+    if (response.statusCode == 200) {
     var id = responseJson['id'];
     String email= responseJson['email'];
-    email == null || email == ""?email="New user registered":email =email;
-    // var lastId;
-    // SharedPreferences pref = await SharedPreferences.getInstance();
-    // lastId = pref.getString('id');
-    // lastId == null || lastId == "" ?lastId=id: lastId=lastId;
+     String name= responseJson['name'];
+    var urlSet = Uri.parse("https://api.tonserver.cf/public/api/read/update.php?id=$id&see=1");
+    final response = await http.get(urlSet);
+    showNotification(n: '$name',v: '$email', flp: flp);
 
-    if (id == 50 || id == "50") {
-      showNotification(v: '$email', flp: flp);
-      // SharedPreferences pref = await SharedPreferences.getInstance();
-      // pref.setString('id', id);
 
-    } else {
-      //  showNotification(v: 'hi...ton', flp: flp);
       print("no messgae");
     }
     return Future.value(true);
